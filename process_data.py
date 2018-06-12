@@ -1,9 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
-filename = 'myspeed.csv'
-df = pd.read_csv(filename)
+import sys
+import click
 
 #Important Col. Names and Techniques
 #print(df.columns.values.tolist())
@@ -11,7 +10,7 @@ df = pd.read_csv(filename)
 #print(df['Service Provider'].unique())
 #print(df['Technology'].unique())
 
-def constant_operator(operator, technology):
+def constant_operator(df, operator, technology, save):
     states = df['LSA'].unique()
     speedsdown =[]
     speedsup = []
@@ -30,12 +29,13 @@ def constant_operator(operator, technology):
             f_states.append(state)
             speedsdown.append(down)
             speedsup.append(up)
-    print('download: ' + str(down) + '  upload: ' + str(up))
+        if(v):            
+            print('download: ' + str(down) + '  upload: ' + str(up))
 
         
-    plot_double_bar_state(states, speedsdown, speedsup)        
+    plot_double_bar_state(f_states, operator, speedsdown, speedsup, save)        
 
-def constant_state(state, technology):
+def constant_state(df, state, technology, save):
     operators = df['Service Provider'].unique()
     speedsdown =[]
     speedsup = []
@@ -54,9 +54,9 @@ def constant_state(state, technology):
             f_operators.append(operator)
             speedsdown.append(down)
             speedsup.append(up)
-        print('download: ' + str(down) + '  upload: ' + str(up))
+            print('download: ' + str(down) + '  upload: ' + str(up))
             
-    plot_double_bar_operator(f_operators, speedsdown, speedsup)
+    plot_double_bar_operator(f_operators, state, speedsdown, speedsup, save)
     
 
 def plot_single_bar_x():
@@ -68,7 +68,7 @@ def plot_single_bar_x():
     plt.title('Avg. Download speed for different operators for Operator')
     plt.show()
 
-def plot_double_bar_state(states, speedsdown, speedsup):
+def plot_double_bar_state(states, operator, speedsdown, speedsup, save):
     fig, ax = plt.subplots()
     index = np.arange(len(states))
     bar_width = 0.35
@@ -86,13 +86,16 @@ def plot_double_bar_state(states, speedsdown, speedsup):
      
     plt.xlabel('States')
     plt.ylabel('Average Speeds')
-    plt.title('Avg. Download speed for different operators for Operator')
+    plt.title('Avg. Download speed for different operators for ' + str(operator))
     plt.xticks(index + bar_width, states, rotation=90)
     plt.legend()
     plt.tight_layout()
+
+    if (save):
+        plt.savefig('stats_const_operator_' + str(operator) + '.svg')
     plt.show()
 
-def plot_double_bar_operator(operators, speedsdown, speedsup):
+def plot_double_bar_operator(operators, state, speedsdown, speedsup, save):
     fig, ax = plt.subplots()
     index = np.arange(len(operators))
     bar_width = 0.35
@@ -110,16 +113,46 @@ def plot_double_bar_operator(operators, speedsdown, speedsup):
      
     plt.xlabel('Service Providers')
     plt.ylabel('Average Speeds')
-    plt.title('Avg. Download speed for different operators for State')
+    plt.title('Avg. Download speed for different operators for ' + str(state))
     plt.xticks(index + bar_width, operators, rotation=90)
     plt.legend()
     plt.tight_layout()
+
+    if (save):
+        plt.savefig('stats_const_operator' + str(operator) + '.svg', dpi=1000)
     plt.show()
 
-constant_operator('AIRTEL', '4G')
+#constant_operator('AIRTEL', '4G')
 #plot_double_bar_state()
 
 #constant_state('Delhi', '3G')
 #plot_double_bar_servicep()
+
+@click.command()
+@click.option('--filename', '-f', default='myspeed.csv', help='Name of the CSV file')
+@click.option('--op', type=(int, str), help='Specifies the type of operation:\n1. Common Operator\n2. Common State\nFollowed by the common operator or state')
+@click.option('--tech', '-t', prompt='Enter the technology needed', type=click.Choice(['3G', '4G']), help='Option to specify the technology')
+@click.option('--save', '-s', type=click.Choice(['0', '1']), default='0', help='Option to save the graph')
+@click.option('--verbose', type=click.Choice(['0', '1']), default='0', help='Option for verbosity')
+
+
+def processthis(filename, op, tech, save, verbose):
+    global v
+    v = verbose
+    '''if (verbose == 'y'):
+        v = 1
+    else:
+        v = 0'''
+    df = pd.read_csv(filename)
+    if (op[0] == 1):
+        constant_operator(df, op[1], tech, save)
+    elif (op[0] == 2):
+        constant_state(df, op[1], tech, save)
+    else:
+        print('Incorrect Input')
+        
+
+if __name__ == '__main__':
+    processthis()
 
 
