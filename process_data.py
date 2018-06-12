@@ -4,60 +4,69 @@ import numpy as np
 
 filename = 'myspeed.csv'
 df = pd.read_csv(filename)
-print(list(df.columns.values))
 
 #Important Col. Names and Techniques
 #print(df.columns.values.tolist())
 #print(df["Data Speed(Mbps)"].mean())
 #print(df['Service Provider'].unique())
 #print(df['Technology'].unique())
-#print('TOTAL STATES: ' + str(len(states)))
-#print('TOTAL PROVIDERS: ' + str(len(providers)))
 
-def constant_operator(servicep, technology):
-
+def constant_operator(operator, technology):
     states = df['LSA'].unique()
     speedsdown =[]
     speedsup = []
+    f_states = []
+    #print('TOTAL STATES: ' + str(len(states)))
     
     for state in states:
-        ttype = (df[(df['LSA'] == state) & (df['Service Provider'] == servicep) &(df['Technology'] == technology)])
+        ttype = (df[(df['LSA'] == state) & (df['Service Provider'] == operator) & (df['Technology'] == technology)])
         down = (ttype[ttype['Test_type'] == 'Download']["Data Speed(Mbps)"]).mean()
         up =(ttype[ttype['Test_type'] == 'Upload']["Data Speed(Mbps)"]).mean()
 
         if (pd.isnull(down)):
             down = 0
-        if (pd.isnull(up)):
             up = 0
-        #print(down)
-        #print(up)
-        speedsdown.append(down)
-        speedsup.append(up)
+        else:
+            f_states.append(state)
+            speedsdown.append(down)
+            speedsup.append(up)
+    print('download: ' + str(down) + '  upload: ' + str(up))
+
         
-    plot_double_bar_state(states, speedsdown, speedsup)
-        
-        
+    plot_double_bar_state(states, speedsdown, speedsup)        
 
 def constant_state(state, technology):
     operators = df['Service Provider'].unique()
     speedsdown =[]
     speedsup = []
+    f_operators = []
+    #print('TOTAL PROVIDERS: ' + str(len(providers)))
 
-    for servicep in operators:
-        ttype = (df[(df['LSA'] == state) & (df['Service Provider'] == servicep) &(df['Technology'] == technology)])
+    for operator in operators:
+        ttype = (df[(df['LSA'] == state) & (df['Service Provider'] == operator) &(df['Technology'] == technology)])
         down = (ttype[ttype['Test_type'] == 'Download']["Data Speed(Mbps)"]).mean()
         up =(ttype[ttype['Test_type'] == 'Upload']["Data Speed(Mbps)"]).mean()
 
         if (pd.isnull(down)):
             down = 0
-        if (pd.isnull(up)):
             up = 0
-        #print(down)
-        #print(up)
-        speedsdown.append(down)
-        speedsup.append(up)
-    plot_double_bar_operator(operators, speedsdown, speedsup)
+        else:
+            f_operators.append(operator)
+            speedsdown.append(down)
+            speedsup.append(up)
+        print('download: ' + str(down) + '  upload: ' + str(up))
+            
+    plot_double_bar_operator(f_operators, speedsdown, speedsup)
     
+
+def plot_single_bar_x():
+    index = np.arange(len(states))
+    plt.bar(index, speeds)
+    plt.xlabel('States', fontsize=5)
+    plt.ylabel('Download Speed', fontsize=5)
+    plt.xticks(index, states, fontsize=5, rotation=30)
+    plt.title('Avg. Download speed for different operators for Operator')
+    plt.show()
 
 def plot_double_bar_state(states, speedsdown, speedsup):
     fig, ax = plt.subplots()
@@ -107,7 +116,7 @@ def plot_double_bar_operator(operators, speedsdown, speedsup):
     plt.tight_layout()
     plt.show()
 
-constant_operator('AIRTEL', '3G')
+constant_operator('AIRTEL', '4G')
 #plot_double_bar_state()
 
 #constant_state('Delhi', '3G')
