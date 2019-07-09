@@ -3,6 +3,8 @@
 
 SpeedAnalyze is a script written in python that can analyze dataspeeds sourced from [TRAI MySpeed Portal](www.myspeed.trai.gov.in), and can sort data on the basis of network operators and states. It can also compare and plot bar-graphs.
 
+A guide was written for the GeeksForGeeks Technical Scripter contest where the process is described and the code is explained. **Check out:** [Analyzing Mobile Data Speeds from TRAI with Pandas](https://www.geeksforgeeks.org/analyzing-mobile-data-speeds-from-trai-with-pandas/).
+Won a prize for that! 🕺
 
 ![Example barplot:](/images/bar_chart_jio.png)
 
